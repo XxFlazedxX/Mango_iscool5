@@ -1,0 +1,154 @@
+local player = game:GetService("Players").LocalPlayer
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "PullThrowGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 195)
+frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.Active = true
+frame.Draggable = true
+frame.Visible = true
+frame.Parent = gui
+
+-- Floating Open Button (+)
+local openBtn = Instance.new("TextButton")
+openBtn.Size = UDim2.new(0, 40, 0, 40)
+openBtn.Position = UDim2.new(0.3, 210, 0.3, 0)
+openBtn.Text = "-"
+openBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 204)
+openBtn.TextColor3 = Color3.new(1, 1, 1)
+openBtn.Font = Enum.Font.Gotham
+openBtn.TextSize = 20
+openBtn.BorderSizePixel = 0
+openBtn.Parent = gui
+openBtn.Active = true
+openBtn.Draggable = true
+
+local frameVisible = true
+openBtn.MouseButton1Click:Connect(function()
+	frameVisible = not frameVisible
+	frame.Visible = frameVisible
+	openBtn.Text = frameVisible and "-" or "+"
+end)
+
+-- Label
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 0, 25)
+label.Position = UDim2.new(0, 0, 0, 0)
+label.BackgroundTransparency = 1
+label.Text = "Made By Mango"
+label.TextColor3 = Color3.new(1, 1, 1)
+label.Font = Enum.Font.GothamBold
+label.TextSize = 16
+label.Parent = frame
+
+-- Throw Button (Biggest)
+local pulling = false
+local pulledOnce = false
+local pullBtn = Instance.new("TextButton")
+pullBtn.Size = UDim2.new(0, 180, 0, 50)
+pullBtn.Position = UDim2.new(0.05, 0, 0, 30)
+pullBtn.Text = "Throw: OFF"
+pullBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 204)
+pullBtn.TextColor3 = Color3.new(1, 1, 1)
+pullBtn.Font = Enum.Font.Gotham
+pullBtn.TextSize = 16
+pullBtn.BorderSizePixel = 0
+pullBtn.Parent = frame
+
+pullBtn.MouseButton1Click:Connect(function()
+	pulling = not pulling
+	pulledOnce = pulling or pulledOnce
+	pullBtn.Text = pulling and "Pull: ON" or "Throw: OFF"
+end)
+
+-- Kill Button (Medium)
+local killOn = false
+local killBtn = Instance.new("TextButton")
+killBtn.Size = UDim2.new(0, 180, 0, 35)
+killBtn.Position = UDim2.new(0.05, 0, 0, 85)
+killBtn.Text = "Kill: OFF"
+killBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 204)
+killBtn.TextColor3 = Color3.new(1, 1, 1)
+killBtn.Font = Enum.Font.Gotham
+killBtn.TextSize = 16
+killBtn.BorderSizePixel = 0
+killBtn.Parent = frame
+
+killBtn.MouseButton1Click:Connect(function()
+	killOn = not killOn
+	killBtn.Text = killOn and "Kill: ON" or "Kill: OFF"
+
+	local pit = workspace:FindFirstChild("Pit")
+	if pit and pit:FindFirstChild("Damage") then
+		pit.Damage.Size = killOn and Vector3.new(1000, 1000, 1000) or Vector3.new(0, 0, 0)
+	end
+
+	local char = player.Character
+	if char then
+		for _, part in pairs(char:GetChildren()) do
+			if part:IsA("BasePart") then
+				part.CanTouch = not killOn
+				part.CanCollide = not killOn
+			end
+		end
+	end
+end)
+
+-- Nameless Button
+local injected = false
+local nameBtn = Instance.new("TextButton")
+nameBtn.Size = UDim2.new(0, 180, 0, 25)
+nameBtn.Position = UDim2.new(0.05, 0, 0, 125)
+nameBtn.Text = "Nameless: Inject"
+nameBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 204)
+nameBtn.TextColor3 = Color3.new(1, 1, 1)
+nameBtn.Font = Enum.Font.Gotham
+nameBtn.TextSize = 14
+nameBtn.BorderSizePixel = 0
+nameBtn.Parent = frame
+
+nameBtn.MouseButton1Click:Connect(function()
+	if injected then return end
+	injected = true
+	nameBtn.Text = "Nameless: Injected"
+
+	local function applyNameless()
+		local char = player.Character
+		if char and char:FindFirstChild("Humanoid") then
+			char.Humanoid.DisplayName = " "
+		end
+	end
+
+	player.CharacterAppearanceLoaded:Connect(function()
+		applyNameless()
+	end)
+
+	applyNameless()
+end)
+
+-- ChatSpy Button (same size as Nameless)
+local chatInjected = false
+local chatBtn = Instance.new("TextButton")
+chatBtn.Size = UDim2.new(0, 180, 0, 25)
+chatBtn.Position = UDim2.new(0.05, 0, 0, 155)
+chatBtn.Text = "Chatspy: Inject"
+chatBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 204)
+chatBtn.TextColor3 = Color3.new(1, 1, 1)
+chatBtn.Font = Enum.Font.Gotham
+chatBtn.TextSize = 14
+chatBtn.BorderSizePixel = 0
+chatBtn.Parent = frame
+
+chatBtn.MouseButton1Click:Connect(function()
+	if chatInjected then return end
+	chatInjected = true
+	chatBtn.Text = "Chatspy: Injected"
+	loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Chat-Spy-2025-45263"))()
+end)

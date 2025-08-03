@@ -1,4 +1,5 @@
 local player = game:GetService("Players").LocalPlayer
+repeat wait() until player and player.Character and player:FindFirstChild("PlayerGui")
 
 -- GUI
 local gui = Instance.new("ScreenGui")
@@ -32,9 +33,9 @@ openBtn.Draggable = true
 
 local frameVisible = true
 openBtn.MouseButton1Click:Connect(function()
-	frameVisible = not frameVisible
-	frame.Visible = frameVisible
-	openBtn.Text = frameVisible and "-" or "+"
+    frameVisible = not frameVisible
+    frame.Visible = frameVisible
+    openBtn.Text = frameVisible and "-" or "+"
 end)
 
 -- Label
@@ -48,7 +49,7 @@ label.Font = Enum.Font.GothamBold
 label.TextSize = 16
 label.Parent = frame
 
--- Throw Button (Biggest)
+-- Pull / Throw Button
 local pulling = false
 local pulledOnce = false
 local pullBtn = Instance.new("TextButton")
@@ -63,12 +64,32 @@ pullBtn.BorderSizePixel = 0
 pullBtn.Parent = frame
 
 pullBtn.MouseButton1Click:Connect(function()
-	pulling = not pulling
-	pulledOnce = pulling or pulledOnce
-	pullBtn.Text = pulling and "Pull: ON" or "Throw: OFF"
+    pulling = not pulling
+    pulledOnce = pulling or pulledOnce
+    pullBtn.Text = pulling and "Pull: ON" or "Throw: OFF"
 end)
 
--- Kill Button (Medium)
+-- Macro Logic
+local function getRope()
+    local ropesFolder = workspace:FindFirstChild("Ropes")
+    if not ropesFolder then return nil end
+    local userRope = ropesFolder:FindFirstChild(player.Name)
+    if not userRope then return nil end
+    return userRope:FindFirstChild("mainConnectionRope")
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    local rope = getRope()
+    if rope then
+        if pulling then
+            rope.Length = 5
+        elseif pulledOnce then
+            rope.Length = 100000000000000000
+        end
+    end
+end)
+
+-- Kill Button
 local killOn = false
 local killBtn = Instance.new("TextButton")
 killBtn.Size = UDim2.new(0, 180, 0, 35)
@@ -82,23 +103,23 @@ killBtn.BorderSizePixel = 0
 killBtn.Parent = frame
 
 killBtn.MouseButton1Click:Connect(function()
-	killOn = not killOn
-	killBtn.Text = killOn and "Kill: ON" or "Kill: OFF"
+    killOn = not killOn
+    killBtn.Text = killOn and "Kill: ON" or "Kill: OFF"
 
-	local pit = workspace:FindFirstChild("Pit")
-	if pit and pit:FindFirstChild("Damage") then
-		pit.Damage.Size = killOn and Vector3.new(1000, 1000, 1000) or Vector3.new(0, 0, 0)
-	end
+    local pit = workspace:FindFirstChild("Pit")
+    if pit and pit:FindFirstChild("Damage") then
+        pit.Damage.Size = killOn and Vector3.new(1000, 1000, 1000) or Vector3.new(0, 0, 0)
+    end
 
-	local char = player.Character
-	if char then
-		for _, part in pairs(char:GetChildren()) do
-			if part:IsA("BasePart") then
-				part.CanTouch = not killOn
-				part.CanCollide = not killOn
-			end
-		end
-	end
+    local char = player.Character
+    if char then
+        for _, part in pairs(char:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanTouch = not killOn
+                part.CanCollide = not killOn
+            end
+        end
+    end
 end)
 
 -- Nameless Button
@@ -115,25 +136,25 @@ nameBtn.BorderSizePixel = 0
 nameBtn.Parent = frame
 
 nameBtn.MouseButton1Click:Connect(function()
-	if injected then return end
-	injected = true
-	nameBtn.Text = "Nameless: Injected"
+    if injected then return end
+    injected = true
+    nameBtn.Text = "Nameless: Injected"
 
-	local function applyNameless()
-		local char = player.Character
-		if char and char:FindFirstChild("Humanoid") then
-			char.Humanoid.DisplayName = " "
-		end
-	end
+    local function applyNameless()
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.DisplayName = " "
+        end
+    end
 
-	player.CharacterAppearanceLoaded:Connect(function()
-		applyNameless()
-	end)
+    player.CharacterAppearanceLoaded:Connect(function()
+        applyNameless()
+    end)
 
-	applyNameless()
+    applyNameless()
 end)
 
--- ChatSpy Button (same size as Nameless)
+-- ChatSpy Button
 local chatInjected = false
 local chatBtn = Instance.new("TextButton")
 chatBtn.Size = UDim2.new(0, 180, 0, 25)
@@ -147,8 +168,8 @@ chatBtn.BorderSizePixel = 0
 chatBtn.Parent = frame
 
 chatBtn.MouseButton1Click:Connect(function()
-	if chatInjected then return end
-	chatInjected = true
-	chatBtn.Text = "Chatspy: Injected"
-	loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Chat-Spy-2025-45263"))()
+    if chatInjected then return end
+    chatInjected = true
+    chatBtn.Text = "Chatspy: Injected"
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Chat-Spy-2025-45263"))()
 end)
